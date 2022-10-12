@@ -2,6 +2,7 @@ package com.caiqiu.app.model.controller;
 
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.caiqiu.app.config.redis.RedisService;
 import com.caiqiu.app.config.security.service.CustomerUserDetailsService;
 import com.caiqiu.app.exception.MyException;
@@ -29,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -86,7 +88,7 @@ public class UserController {
     @ApiOperation("登录验证")
     @ApiImplicitParam(name = "loginVO")
     @PostMapping("/login")
-    public UserDetails login(LoginVO loginVO) {
+    public UserDetails login(@Validated LoginVO loginVO) {
 
 //        //判断验证码是否正确
 //        String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
@@ -99,6 +101,8 @@ public class UserController {
 //        if (!loginVO.getCode().equalsIgnoreCase(captcha)){  //比较是否相等，但忽略大小写
 //            throw new MyException(ResultCode.ERROR,"验证码错误");   //提示验证码错误
 //        }
+
+
         //判断用户名密码是否正确
         UserDetails user = customerUserDetailsService.loadUserByUsername(loginVO.getUsername());
         return user;
