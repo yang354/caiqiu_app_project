@@ -11,8 +11,8 @@ public class LoginVO {
     @NotBlank(message = "用户密码不能为空")
     private String password;
 
-//    private String code;
-//    private String uuid;
+    private String code;
+    private String uuid;
 
 
 }

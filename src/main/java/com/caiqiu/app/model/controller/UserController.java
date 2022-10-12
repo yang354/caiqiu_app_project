@@ -118,19 +118,20 @@ public class UserController {
     @ApiImplicitParam(name = "loginVO")
     @PostMapping("/login")
     public Result login(@Validated LoginVO loginVO) {
+        System.out.println(loginVO.toString());
         //开发时不要打开
         //判断验证码是否正确
-//        String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
-//        System.out.println(verifyKey);
-//        String captcha = redisService.getCacheObject(verifyKey);
-//        redisService.deleteObject(verifyKey);
-//        if (captcha == null){
-//
-//            throw new MyException(ResultCode.ERROR,"验证码已失效");  //提示验证码已失效
-//        }
-//        if (!loginVO.getCode().equalsIgnoreCase(captcha)){  //比较是否相等，但忽略大小写
-//            throw new MyException(ResultCode.ERROR,"验证码错误");   //提示验证码错误
-//        }
+        String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
+        System.out.println(verifyKey);
+        String captcha = redisService.getCacheObject(verifyKey);
+        redisService.deleteObject(verifyKey);
+        if (captcha == null){
+
+            throw new MyException(ResultCode.ERROR,"验证码已失效");  //提示验证码已失效
+        }
+        if (!loginVO.getCode().equalsIgnoreCase(captcha)){  //比较是否相等，但忽略大小写
+            throw new MyException(ResultCode.ERROR,"验证码错误");   //提示验证码错误
+        }
 
 
         // 用户验证
