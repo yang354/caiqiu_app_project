@@ -84,7 +84,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         //登录前进行过滤
         http.formLogin()  //表单登录
                 //注意指定了登录url，使用@RepeatSubmit防重复提交注解则不会生效，只有当不指定时为普通的url就可以生效
-                .loginProcessingUrl("/api/user/login")  //登录请求url地址，自定义即可
+                //.loginProcessingUrl("/api/user/login")  //登录请求url地址，自定义即可
                 // 设置登录验证成功或失败后的的跳转地址
                 .successHandler(loginSuccessHandler)  //认证成功处理器
                 .failureHandler(loginFailureHandler) //认证失败处理器
