@@ -1,6 +1,5 @@
 package com.caiqiu.app.config.security.exception;
 
-
 import org.springframework.security.core.AuthenticationException;
 
 /**

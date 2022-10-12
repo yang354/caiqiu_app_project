@@ -7,7 +7,9 @@ import com.caiqiu.app.config.security.exception.CustomerAuthenticationException;
 import com.caiqiu.app.config.security.handler.LoginFailureHandler;
 import com.caiqiu.app.config.security.service.CustomerUserDetailsService;
 import com.caiqiu.app.config.security.util.IgnoredUrlsConfig;
+import com.caiqiu.app.exception.MyException;
 import com.caiqiu.app.utils.JwtUtils;
+import com.caiqiu.app.utils.ResultCode;
 import lombok.Data;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -46,12 +48,15 @@ public class CheckTokenFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try {
-            this.validateToken(request);
+//        try {
+//
+//
+//        } catch (AuthenticationException e) {
+//            //System.out.println(e.getMessage());
+//            //loginFailureHandler.onAuthenticationFailure(request, response, e);
+//        }
+        this.validateToken(request);
 
-        } catch (AuthenticationException e) {
-            //loginFailureHandler.onAuthenticationFailure(request, response, e);
-        }
 
         //登录请求不需要验证token
         doFilter(request,response,filterChain);
@@ -75,7 +80,7 @@ public class CheckTokenFilter extends OncePerRequestFilter {
             String username = jwtUtils.getUsernameFromToken(token);
             //判断是否username为空
             if (username == null) {
-                throw new CustomerAuthenticationException("token验证失败");
+                throw new CustomerAuthenticationException("token认证失败，无法访问系统资源，请先登录!");
             }
             //获取用户信息
             UserDetails userDetails = customerUserDetailsService.loadUserByUsername(username);
@@ -85,30 +90,5 @@ public class CheckTokenFilter extends OncePerRequestFilter {
             //设置到Spring Security上下文
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         }
-
-//        //如果请求参数中也不存在token信息，则抛出异常
-//        if (ObjectUtils.isEmpty(token)) {
-//
-//            throw new CustomerAuthenticationException("token不存在");
-//        }
-//        System.out.println("token存在");
-//        //判断redis中是否存在该token
-//        String tokenKey = "token_" + token;
-//        String redisToken = redisService.get(tokenKey);
-//        //如果redis里面没有token,说明该token失效
-//        if (ObjectUtils.isEmpty(redisToken)) {
-//            throw new CustomerAuthenticationException("token已过期");
-//        }
-//        //如果token和Redis中的token不一致，则验证失败
-//        if (!token.equals(redisToken)) {
-//            throw new CustomerAuthenticationException("token验证失败");
-//        }
-//        //如果存在token，则从token中解析出用户名
-//        String username = jwtUtils.getUsernameFromToken(token);
-//        //如果用户名为空，则解析失败
-//        if (ObjectUtils.isEmpty(username)) {
-//            throw new CustomerAuthenticationException("token解析失败");
-//        }
-
     }
 }
