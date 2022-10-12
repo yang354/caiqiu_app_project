@@ -4,11 +4,12 @@ package com.caiqiu.app.config.security;
 
 
 import com.caiqiu.app.config.security.filter.CheckTokenFilter;
-import com.caiqiu.app.config.security.handler.AnonymousAuthenticationHandler;
+import com.caiqiu.app.config.security.handler.AuthenticationEntryPointHandler;
 import com.caiqiu.app.config.security.handler.LoginFailureHandler;
 import com.caiqiu.app.config.security.handler.LoginSuccessHandler;
 import com.caiqiu.app.config.security.service.CustomerUserDetailsService;
 import com.caiqiu.app.config.security.util.IgnoredUrlsConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -37,8 +38,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     @Resource
     private LoginFailureHandler loginFailureHandler;
 
-    @Resource
-    private AnonymousAuthenticationHandler anonymousAuthenticationHandler;
+
 
     @Resource
     private CheckTokenFilter checkTokenFilter;
@@ -47,12 +47,30 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     private IgnoredUrlsConfig ignoredUrlsConfig;
 
     /**
+     * 认证失败处理类
+     */
+    @Autowired
+    private AuthenticationEntryPointHandler unauthorizedHandler;
+
+    /**
     * 注入加密处理类
     * @return
     */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * 解决 无法直接注入 AuthenticationManager
+     *
+     * @return
+     * @throws Exception
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
 
@@ -84,12 +102,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         //登录前进行过滤
         http.formLogin()  //表单登录
                 //注意指定了登录url，使用@RepeatSubmit防重复提交注解则不会生效，只有当不指定时为普通的url就可以生效
-                .loginProcessingUrl("/api/user/login")  //登录请求url地址，自定义即可
+//                .loginProcessingUrl("/api/user/login")  //登录请求url地址，自定义即可
                 // 设置登录验证成功或失败后的的跳转地址
-                .successHandler(loginSuccessHandler)  //认证成功处理器
-                .failureHandler(loginFailureHandler) //认证失败处理器
+                //.successHandler(loginSuccessHandler)  //认证成功处理器
+                //.failureHandler(loginFailureHandler) //认证失败处理器
                 // 禁用csrf防御机制
                 .and().csrf().disable()
+                // 认证失败处理类
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler)
+                .and()
                 //不创建session
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -100,9 +121,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .and()
                 .exceptionHandling()
-                //匿名无权限访问   就是表示你没有登录访问资源会触发
-                .authenticationEntryPoint(anonymousAuthenticationHandler)
-
                 .and().cors();//开启跨域配置
 
     }

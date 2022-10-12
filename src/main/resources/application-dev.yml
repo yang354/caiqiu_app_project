@@ -56,7 +56,7 @@ secure:
   ignored:
     urls: #安全路径白名单
 #      - /**
-#      - /api/user/login
+      - /api/user/login
       - /swagger-ui/index.html
       - /swagger-resources/**
       - /swagger/**

@@ -51,7 +51,9 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 //            message = "账户不存在,登录失败!";
             message = exception.getMessage();
         } else if (exception instanceof CustomerAuthenticationException) {  //获取token过滤器的错误信息
+
             message = exception.getMessage();
+            System.out.println(message+"~~~~~~~~~~~~~");
             code = 600;
         }else{
             message = "登录失败!"; }

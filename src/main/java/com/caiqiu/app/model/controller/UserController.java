@@ -1,9 +1,11 @@
 package com.caiqiu.app.model.controller;
 
 
-
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.caiqiu.app.config.redis.RedisService;
+import com.caiqiu.app.config.security.context.AuthenticationContextHolder;
 import com.caiqiu.app.config.security.service.CustomerUserDetailsService;
 import com.caiqiu.app.exception.MyException;
 import com.caiqiu.app.model.entity.User;
@@ -25,9 +27,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 
 import org.springframework.beans.BeanUtils;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
@@ -39,18 +46,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author yyyz
  * @since 2022-10-11
  */
-@Api(value = "用户功能",tags = "用户功能",description = "用户功能")
+@Api(value = "用户功能", tags = "用户功能", description = "用户功能")
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -64,6 +74,9 @@ public class UserController {
 
     @Resource
     private CustomerUserDetailsService customerUserDetailsService;
+
+    @Resource
+    private AuthenticationManager authenticationManager;
 
 
     /**
@@ -79,6 +92,22 @@ public class UserController {
     }
 
 
+//    /**
+//     * 登录验证
+//     *
+//     * @param loginVO
+//     * @return
+//     */
+//    @ApiOperation("登录验证")
+//    @ApiImplicitParam(name = "loginVO")
+//    @PostMapping("/login")
+//    public UserDetails login(@Validated LoginVO loginVO) {
+//        //判断用户名密码是否正确
+//        UserDetails user = customerUserDetailsService.loadUserByUsername(loginVO.getUsername());
+//        return user;
+//    }
+
+
     /**
      * 登录验证
      *
@@ -88,14 +117,15 @@ public class UserController {
     @ApiOperation("登录验证")
     @ApiImplicitParam(name = "loginVO")
     @PostMapping("/login")
-    public UserDetails login(@Validated LoginVO loginVO) {
-
-//        //判断验证码是否正确
+    public Result login(@Validated LoginVO loginVO) {
+        //开发时不要打开
+        //判断验证码是否正确
 //        String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
 //        System.out.println(verifyKey);
 //        String captcha = redisService.getCacheObject(verifyKey);
 //        redisService.deleteObject(verifyKey);
 //        if (captcha == null){
+//
 //            throw new MyException(ResultCode.ERROR,"验证码已失效");  //提示验证码已失效
 //        }
 //        if (!loginVO.getCode().equalsIgnoreCase(captcha)){  //比较是否相等，但忽略大小写
@@ -103,13 +133,42 @@ public class UserController {
 //        }
 
 
-        //判断用户名密码是否正确
-        UserDetails user = customerUserDetailsService.loadUserByUsername(loginVO.getUsername());
-        return user;
+        // 用户验证
+        Authentication authentication = null;
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginVO.getUsername(), loginVO.getPassword());
+            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+            authentication = authenticationManager.authenticate(authenticationToken);
+        } catch (Exception e) {
+            if (e instanceof BadCredentialsException) {
+                throw new MyException(ResultCode.ERROR, "登录密码不正确");
+            } else {
+                throw new MyException(ResultCode.ERROR, e.getMessage());
+            }
+        }
+        User loginUser = (User) authentication.getPrincipal();
+        //生成token
+        String token = jwtUtils.generateToken(loginUser);
+
+
+        //把生成的token存到redis
+        String tokenKey = "token_" + token;
+        redisService.set(tokenKey, token, jwtUtils.getExpiration() / 1000);
+
+        //设置token签名密钥及过期时间
+        long expireTime = Jwts.parser() //获取DefaultJwtParser对象
+                .setSigningKey(jwtUtils.getSecret()) //设置签名的密钥
+                .parseClaimsJws(token.replace("jwt_", ""))  //把生成的jwt_前缀 替换为""
+                .getBody().getExpiration().getTime();//获取token过期时间
+
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("id", loginUser.getId());
+        data.put("expireTime", expireTime);
+        data.put("token", token);
+
+        return Result.ok(data);
     }
-
-
-
 
 
     /**
@@ -132,7 +191,7 @@ public class UserController {
 
         //创建用户信息对象
         UserInfoVO userInfo = new UserInfoVO();
-        BeanUtils.copyProperties(user,userInfo);
+        BeanUtils.copyProperties(user, userInfo);
 
         //返回数据
         return Result.ok(userInfo);
@@ -146,7 +205,7 @@ public class UserController {
      * @return
      */
     @Operation(summary = "刷新token")
-    @Parameter(description = "HttpServletRequest",name = "request")
+    @Parameter(description = "HttpServletRequest", name = "request")
     @PostMapping("/refreshToken")
     public Result refreshToken(HttpServletRequest request) {
         //从header中获取前端提交的token
@@ -192,8 +251,8 @@ public class UserController {
      */
     @Operation(summary = "用户退出")
     @Parameters({
-            @Parameter(description = "HttpServletRequest",name = "request"),
-            @Parameter(description = "HttpServletResponse",name = "response")
+            @Parameter(description = "HttpServletRequest", name = "request"),
+            @Parameter(description = "HttpServletResponse", name = "response")
     })
     @PostMapping("/logout")
     public Result logout(HttpServletRequest request, HttpServletResponse response) {
@@ -207,7 +266,7 @@ public class UserController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             //清空用户信息
-            new SecurityContextLogoutHandler().logout(request, response,authentication);
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
             //清空redis里面的token
             String key = "token_" + token;
             redisService.del(key);
