@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.caiqiu.app.model.dao.LotteryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.caiqiu.app.model.entity.Lottery">
+        <id column="id" property="id" />
+        <result column="draw_date" property="drawDate" />
+        <result column="Issue_number" property="issueNumber" />
+        <result column="draw_number" property="drawNumber" />
+        <result column="number_distribution" property="numberDistribution" />
+        <result column="span" property="span" />
+        <result column="parity" property="parity" />
+        <result column="size_ratio" property="sizeRatio" />
+        <result column="and_value" property="andValue" />
+        <result column="movements" property="movements" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, draw_date, Issue_number, draw_number, number_distribution, span, parity, size_ratio, and_value, movements
+    </sql>
+
+</mapper>

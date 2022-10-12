@@ -1,0 +1,103 @@
+server:
+  port: 9999
+
+
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://43.139.97.61:3306/db_caiqiu?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: xiangchuhai123
+  jackson:  #JSON日期格式化
+    date-format: yyyy-MM-dd
+    time-zone: Asia/Shanghai
+  mvc:  #日期格式化
+    format:
+      date: yyyy-MM-dd
+      date-time: yyyy-MM-dd HH:mm:ss
+  ################################# Redis相关配置 #################################
+  redis:
+    host: 43.139.97.61
+    port: 6379
+    database: 0
+    timeout: 10000
+    #自定义属性
+    expire: 60000
+
+
+
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  #type-aliases-package: com.qft.web.**.entity
+#  configuration:
+#    map-underscore-to-camel-case: false
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+
+
+
+logging:
+  config: classpath:logback.xml
+
+
+#jwt配置
+#密钥
+jwt:
+  secret: com.qft
+  expiration: 1800000
+
+
+secure:
+  ignored:
+    urls: #安全路径白名单
+#      - /**
+      - /swagger-ui/index.html
+      - /swagger-resources/**
+      - /swagger/**
+      - /v2/**
+      - /swagger-ui/**
+      - /v3/**
+      - /**/*.js
+      - /**/*.css
+      - /**/*.png
+      - /**/*.ico
+      - /webjars/**
+      - /druid/**
+      - /static/qrcode/**
+      - /captchaImage
+
+
+
+
+
+
+
+
+
+# 项目相关配置
+projectconfig:
+  # 名称
+  name: xxxx
+  # 版本
+  version: xxxx
+  # 版权年份
+  copyrightYear: xxxx
+  # 实例演示开关
+  demoEnabled: true
+  # 文件路径 示例（ Windows配置D:/xxxx/uploadPath，Linux配置 /home/xxxx/uploadPath）
+  profile: /Users/yyyz/Desktop/ruoyi/uploadPath
+  # 获取ip地址开关
+  addressEnabled: false
+  # 验证码类型 math 数组计算 char 字符验证
+  captchaType: math
+
+
+# token配置
+token:
+  # 令牌自定义标识
+  header: Authorization
