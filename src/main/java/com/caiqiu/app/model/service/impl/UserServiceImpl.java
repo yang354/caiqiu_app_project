@@ -1,10 +1,10 @@
 package com.caiqiu.app.model.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.caiqiu.app.model.entity.User;
-import com.caiqiu.app.model.dao.UserMapper;
-import com.caiqiu.app.model.service.UserService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.caiqiu.app.model.dao.UserMapper;
+import com.caiqiu.app.model.entity.User;
+import com.caiqiu.app.model.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +27,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         queryWrapper.eq("username",username);
         //返回查询记录
         return baseMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User findUsers() {
+        User user = baseMapper.selectList(null).get(0);
+        //返回清除密码
+        user.setPassword(null);
+        return user;
     }
 
 }

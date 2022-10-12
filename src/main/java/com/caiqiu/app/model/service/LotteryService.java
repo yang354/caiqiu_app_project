@@ -1,7 +1,11 @@
 package com.caiqiu.app.model.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.caiqiu.app.model.entity.Lottery;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.caiqiu.app.vo.lottery.LotteryVO;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface LotteryService extends IService<Lottery> {
 
+    IPage<Lottery> findLotterys(IPage<Lottery> page,LotteryVO lotteryVO);
 }

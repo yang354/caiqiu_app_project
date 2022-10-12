@@ -73,7 +73,7 @@ public class UserController {
     @GetMapping("/userCenter")
     public Result getUserCenter() {
         // TODO: 2022/10/11
-        return null;
+        return Result.ok(userService.findUsers());
     }
 
 
