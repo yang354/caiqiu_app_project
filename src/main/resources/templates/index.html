@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
+    <title>Document</title>
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title></title>
+    <style>
+
+        .el-input__inner {
+            height: 50px;
+        }
+
+        .el-tabs--border-card > .el-tabs__content {
+            padding: 25px;
+        }
+
+        .h1 {
+            color: #ffffff;
+        }
+
+        .text {
+            font-size: 54px;
+        }
+
+        .item {
+            padding: 18px 0;
+        }
+
+        .box-card {
+            width: 760px;
+        }
+
+        .admin-card {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 80px;
+        }
+
+        .el-tabs__item {
+            font-size: 20px !important;
+        }
+
+        .el-form-item__label {
+            display: block;
+            margin-block-start: 0.67em;
+            margin-block-end: 0.67em;
+            font-weight: bold;
+            font-size: 1em !important;
+        }
+
+        #app {
+            background-color: #34631d;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+<div id="app">
+    <div>
+        <h1 class="h1" align="center">彩球管理</h1>
+        <div class="admin-card" align="center" shadow="never">
+            <el-tabs v-model="activeName" @tab-click="handleClick" type="border-card" class="box-card">
+                <el-tab-pane label="增加" name="first">
+                    <el-form :label-position="labelPosition" ref="form" :rules="rules" label-width="90px"
+                             :model="form">
+                        <el-form-item label="开奖号码" prop="region">
+                            <el-input type="text" placeholder="请输入开奖号码" v-model="form.region" maxlength="5"
+                                      clearable>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="开奖期号" prop="type">
+                            <el-input type="text" placeholder="请输入开奖期号" v-model="form.type" clearable>
+                            </el-input>
+                        </el-form-item>
+
+                        <el-form-item align="center">
+                            <el-button @click="addCaiqiu"> 提交</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+                <el-tab-pane label="修改" name="second">
+                    <el-form :label-position="labelPosition" ref="form" :rules="rules" label-width="90px"
+                             :model="form">
+                        <el-form-item label="开奖号码" prop="region">
+                            <el-input type="text" placeholder="请输入开奖号码" v-model="form.region" maxlength="5"
+                                      clearable>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item label="开奖期号" prop="type">
+                            <el-input type="text" placeholder="请输入开奖期号" v-model="form.type" clearable>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item align="center">
+                            <el-button @click="editCaiqiu"> 提交</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+                <el-tab-pane label="删除" name="third">
+                    <el-form :label-position="labelPosition" ref="form" :rules="rules" label-width="90px"
+                             :model="form">
+                        <el-form-item label="开奖号码" prop="region">
+                            <el-input type="text" placeholder="请输入开奖号码" v-model="form.region" maxlength="5"
+                                      clearable>
+                            </el-input>
+                        </el-form-item>
+                        <el-form-item align="center">
+                            <el-button @click="delCaiqiu"> 删除</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-tab-pane>
+            </el-tabs>
+
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/jquery-1.12.4.js}"></script>
+
+<script th:src="@{/js/vue.js}"></script>
+<script th:src="@{/js/axios.min.js}"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    Vue.config.productionTip = false
+    new Vue({
+        el: "#app",
+        data() {
+            // 自定义验证收款金额
+            var checkMoney = (rule, value, callback) => {
+                //console.log(typeof value, "\\\\/");
+                const moneyReg = /^[0-9]*[1-9][0-9]*$/;
+                if (!Number.isInteger(+value)) {
+                    callback(new Error("请输入数值"));
+                } else {
+                    if (moneyReg.test(value)) {
+                        callback();
+                    } else {
+                        callback(new Error("请输入数值"));
+                    }
+                }
+            };
+            return {
+                activeName: 'first',
+                labelPosition: 'right',
+                form: {
+                    name: '',
+                    region: '',
+                    type: ''
+                },
+                rules: {
+                    region: [{
+                        required: true,
+                        message: "开奖号码不能为空",
+                        trigger: "blur",
+                    }, {
+                        validator: checkMoney,
+                        trigger: "blur"
+                    }],
+                    type: [{
+                        required: true,
+                        message: "开奖期号不能为空",
+                        trigger: "blur",
+                    }, {
+                        validator: checkMoney,
+                        trigger: "blur"
+                    }],
+                }
+            };
+        },
+        methods: {
+            delCaiqiu(){
+                axios({
+                    url: "/api/lottery/delLottery",
+                    method: "post",
+                    params: {
+                        issueNumber: this.form.type
+                    }
+                }).then((res) => {
+                    //console.log(res)
+                    if (res.data.code !== 0){
+                        this.$notify.error({
+                            title: '错误',
+                            message: res.data.msg
+                        });
+                    } else {
+                        this.$notify({
+                            title: '成功',
+                            message: '删除成功',
+                            type: 'success'
+                        });
+                    }
+
+                }).catch((error) => {
+                    console.log(error)
+                })
+            },
+            editCaiqiu(){
+                axios({
+                    url: "/api/lottery/editLottery",
+                    method: "post",
+                    params: {
+                        issueNumber: this.form.type,
+                        drawNumber: this.form.region
+                    }
+                }).then((res) => {
+                    //console.log(res)
+                    if (res.data.code !== 0){
+                        this.$notify.error({
+                            title: '错误',
+                            message: res.data.msg
+                        });
+                    } else {
+                        this.$notify({
+                            title: '成功',
+                            message: '修改成功',
+                            type: 'success'
+                        });
+                    }
+
+                }).catch((error) => {
+                    console.log(error)
+                })
+            },
+            addCaiqiu() {
+                axios({
+                    url: "/api/lottery/addLottery",
+                    method: "post",
+                    params: {
+                        issueNumber: this.form.type,
+                        drawNumber: this.form.region
+                    }
+                }).then((res) => {
+                    //console.log(res)
+                    if (res.data.code !== 0){
+                        this.$notify.error({
+                            title: '错误',
+                            message: res.data.msg
+                        });
+                    } else {
+                        this.$notify({
+                            title: '成功',
+                            message: '添加成功',
+                            type: 'success'
+                        });
+                    }
+
+                }).catch((error) => {
+                    console.log(error)
+                })
+            },
+            reset() {
+                this.form = {
+                    region: null,
+                    type: null,
+
+                };
+                //this.resetForm("form");
+            },
+            handleClick(tab, event) {
+                this.reset();
+                console.log(tab, event);
+            }
+        }
+    })
+</script>
+</body>
+</html>

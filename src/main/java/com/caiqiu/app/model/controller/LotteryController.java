@@ -46,8 +46,8 @@ public class LotteryController {
     @PostMapping("/delLottery")
     public Result delLottery(Long issueNumber) {
         //1.判断期号是否存在，不存在抛出异常
-        if (lotteryService.checkIssueNumber(issueNumber) < 0L) {
-            return Result.error().msg("修改失败，期号不存在");
+        if (lotteryService.checkIssueNumber(issueNumber) <= 0L) {
+            return Result.error().msg("删除失败，期号不存在");
         }
 
         //按期号条件删除
@@ -173,7 +173,7 @@ public class LotteryController {
     @PostMapping("/getLottery")
     public Result getLottery(@RequestBody LotteryQueryVO lotteryQueryVO) {
         //创建分页对象
-        IPage<Lottery> page = new Page<Lottery>(lotteryQueryVO.getPageNo(), lotteryQueryVO.getPageSize());
+        IPage<Lottery> page = new Page<Lottery>(1L, lotteryQueryVO.getPageSize());
         //调用分页查询方法
         lotteryService.findLotterys(page, lotteryQueryVO);
         return Result.ok(page);
