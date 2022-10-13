@@ -20,6 +20,7 @@ public class CommonMetaObjectHandler implements MetaObjectHandler {
         //属性名称，不是字段名称
         this.setFieldValByName("createTime", new Date(), metaObject);
         this.setFieldValByName("updateTime", new Date(), metaObject);
+        this.setFieldValByName("isDelete", 0, metaObject);
     }
 //    @Override
 //    public void insertFill(MetaObject metaObject) { //参数1:元数据对象

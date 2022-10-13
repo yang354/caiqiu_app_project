@@ -3,9 +3,7 @@ package com.caiqiu.app.model.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.caiqiu.app.model.entity.Lottery;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.caiqiu.app.vo.lottery.LotteryVO;
-
-import java.util.List;
+import com.caiqiu.app.vo.lottery.LotteryQueryVO;
 
 /**
  * <p>
@@ -17,5 +15,9 @@ import java.util.List;
  */
 public interface LotteryService extends IService<Lottery> {
 
-    IPage<Lottery> findLotterys(IPage<Lottery> page,LotteryVO lotteryVO);
+    IPage<Lottery> findLotterys(IPage<Lottery> page, LotteryQueryVO lotteryQueryVO);
+
+    Long checkIssueNumber(Long issueNumber);
+
+    Long checkDrawDate(String drawDate);
 }
