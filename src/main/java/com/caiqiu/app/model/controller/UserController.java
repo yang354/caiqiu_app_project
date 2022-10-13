@@ -118,7 +118,6 @@ public class UserController {
     @ApiImplicitParam(name = "loginVO")
     @PostMapping("/login")
     public Result login(@Validated LoginVO loginVO) {
-        System.out.println(loginVO.toString());
         //开发时不要打开
         //判断验证码是否正确
         String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
