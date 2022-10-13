@@ -1,11 +1,11 @@
 package com.caiqiu.app.model.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
-import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+import java.util.Date;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -30,18 +30,17 @@ public class Lottery implements Serializable {
     /**
      * 开奖时间
      */
-    private LocalDateTime drawDate;
+    private String drawDate;
 
     /**
      * 期号
      */
-    @TableField("Issue_number")
     private Long issueNumber;
 
     /**
      * 开奖号码
      */
-    private Integer drawNumber;
+    private String drawNumber;
 
     /**
      * 开奖号分布
@@ -72,6 +71,24 @@ public class Lottery implements Serializable {
      * 和尾走势
      */
     private String movements;
+
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)  //自动填充
+    private Date createTime;
+
+    /**
+     * 修改时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)  //自动填充
+    private Date updateTime;
+
+    /**
+     * 是否删除(0-未删除，1-已删除)
+     */
+    @TableLogic
+    private Integer isDelete;
 
 
 }

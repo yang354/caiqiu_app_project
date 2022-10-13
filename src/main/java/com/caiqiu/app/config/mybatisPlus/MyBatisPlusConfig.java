@@ -2,6 +2,7 @@ package com.caiqiu.app.config.mybatisPlus;
 
 
 import com.baomidou.mybatisplus.annotation.DbType;
+import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
@@ -21,4 +22,7 @@ public class MyBatisPlusConfig {
         // 指定数据库类型
         interceptor.addInnerInterceptor(paginationInnerInterceptor); return interceptor;
     }
+
+
+
 }

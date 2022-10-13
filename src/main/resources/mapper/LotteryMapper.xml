@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.caiqiu.app.model.entity.Lottery">
         <id column="id" property="id" />
         <result column="draw_date" property="drawDate" />
-        <result column="Issue_number" property="issueNumber" />
+        <result column="issue_number" property="issueNumber" />
         <result column="draw_number" property="drawNumber" />
         <result column="number_distribution" property="numberDistribution" />
         <result column="span" property="span" />
@@ -14,11 +14,14 @@
         <result column="size_ratio" property="sizeRatio" />
         <result column="and_value" property="andValue" />
         <result column="movements" property="movements" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="is_delete" property="isDelete" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, draw_date, Issue_number, draw_number, number_distribution, span, parity, size_ratio, and_value, movements
+        id, draw_date, issue_number, draw_number, number_distribution, span, parity, size_ratio, and_value, movements, create_time, update_time, is_delete
     </sql>
 
 </mapper>
