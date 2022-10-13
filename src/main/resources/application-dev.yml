@@ -71,6 +71,10 @@ secure:
       - /druid/**
       - /static/qrcode/**
       - /captchaImage
+      - /caiqiuAdmin
+      - /api/lottery/addLottery
+      - /api/lottery/delLottery
+      - /api/lottery/editLottery
 
 
 
