@@ -75,6 +75,7 @@ secure:
       - /api/lottery/addLottery
       - /api/lottery/delLottery
       - /api/lottery/editLottery
+      - /login2
 
 
 

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css">
+		<title>Document</title>
+		<link rel="stylesheet" th:href="@{/css/login.css}">
+		<link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+	</head>
+	<body>
+		<div id="app">
+			<div class="login">
+				<el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" style="width: 360px">
+					<h3 class="title">彩球后台登录</h3>
+					<el-form-item prop="username">
+						<el-input v-model="loginForm.username" type="text" auto-complete="off" placeholder="账号">
+						</el-input>
+					</el-form-item>
+					<el-form-item prop="password">
+						<el-input v-model="loginForm.password" type="password" auto-complete="off" placeholder="密码">
+
+					</el-form-item>
+					<el-form-item style="width:100%;">
+						<el-button :loading="loading" size="medium" type="primary" style="width:100%;">
+							<span v-if="!loading">登 录</span>
+						</el-button>
+					</el-form-item>
+				</el-form>
+			</div>
+		</div>
+		<script th:src="@{/js/axios.min.js}"></script>
+		<script th:src="@{/js/jquery-1.12.4.js}"></script>
+		<script th:src="@{/js/vue.js}"></script>
+		<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+		<script>
+			new Vue({
+				el: "#app",
+				data() {
+					return {
+						loginForm: {
+							username: "admin",
+							password: "admin123",
+						},
+						loginRules: {
+							username: [{
+								required: true,
+								trigger: "blur",
+								message: "请输入您的账号"
+							}],
+							password: [{
+								required: true,
+								trigger: "blur",
+								message: "请输入您的密码"
+							}],
+						},
+						redirect: undefined
+					};
+				},
+				created() {
+				},
+				methods: {
+
+				}
+			})
+		</script>
+	</body>
+</html>

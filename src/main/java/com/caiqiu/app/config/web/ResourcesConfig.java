@@ -17,6 +17,7 @@ public class ResourcesConfig implements WebMvcConfigurer
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addViewController("/caiqiuAdmin").setViewName("index");
+        registry.addViewController("/login2").setViewName("login");
     }
 
     /**
