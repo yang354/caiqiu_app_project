@@ -174,6 +174,9 @@
         },
         methods: {
             delCaiqiu(){
+                if(this.form.type==""|| this.form.type == undefined){
+                    return;
+                }
                 axios({
                     url: "/api/lottery/delLottery",
                     method: "post",
@@ -200,6 +203,12 @@
                 })
             },
             editCaiqiu(){
+                if(this.form.type==""|| this.form.type == undefined){
+                    return;
+                }
+                if(this.form.region==""|| this.form.region == undefined){
+                    return;
+                }
                 axios({
                     url: "/api/lottery/editLottery",
                     method: "post",
@@ -227,6 +236,13 @@
                 })
             },
             addCaiqiu() {
+                if(this.form.type==""|| this.form.type == undefined){
+                    return;
+                }
+                if(this.form.region==""|| this.form.region == undefined){
+                    return;
+                }
+
                 axios({
                     url: "/api/lottery/addLottery",
                     method: "post",
@@ -248,7 +264,6 @@
                             type: 'success'
                         });
                     }
-
                 }).catch((error) => {
                     console.log(error)
                 })
@@ -263,7 +278,7 @@
             },
             handleClick(tab, event) {
                 this.reset();
-                console.log(tab, event);
+                // console.log(tab, event);
             }
         }
     })
