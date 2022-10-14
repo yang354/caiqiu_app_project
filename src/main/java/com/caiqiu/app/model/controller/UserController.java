@@ -15,6 +15,7 @@ import com.caiqiu.app.utils.Result;
 import com.caiqiu.app.utils.ResultCode;
 import com.caiqiu.app.utils.StringUtils;
 import com.caiqiu.app.vo.LoginVO;
+import com.caiqiu.app.vo.LoginVO2;
 import com.caiqiu.app.vo.TokenVO;
 import com.caiqiu.app.vo.UserInfoVO;
 import io.jsonwebtoken.Jwts;
@@ -110,26 +111,74 @@ public class UserController {
     /**
      * 登录验证
      *
+     * @param loginVO2
+     * @return
+     */
+    @ApiOperation("登录验证-没有验证码")
+    @ApiImplicitParam(name = "loginVO2")
+    @PostMapping("/login2")
+    public Result login2(@Validated LoginVO2 loginVO2) {
+        // 用户验证
+        Authentication authentication = null;
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginVO2.getUsername(), loginVO2.getPassword());
+            // 该方法会去调用UserDetailsServiceImpl.loadUserByUsername
+            authentication = authenticationManager.authenticate(authenticationToken);
+        } catch (Exception e) {
+            if (e instanceof BadCredentialsException) {
+                throw new MyException(ResultCode.ERROR, "登录密码不正确");
+            } else {
+                throw new MyException(ResultCode.ERROR, e.getMessage());
+            }
+        }
+        User loginUser = (User) authentication.getPrincipal();
+        //生成token
+        String token = jwtUtils.generateToken(loginUser);
+
+
+        //把生成的token存到redis
+        String tokenKey = "token_" + token;
+        redisService.set(tokenKey, token, jwtUtils.getExpiration() / 1000);
+
+        //设置token签名密钥及过期时间
+        long expireTime = Jwts.parser() //获取DefaultJwtParser对象
+                .setSigningKey(jwtUtils.getSecret()) //设置签名的密钥
+                .parseClaimsJws(token.replace("jwt_", ""))  //把生成的jwt_前缀 替换为""
+                .getBody().getExpiration().getTime();//获取token过期时间
+
+
+        HashMap<String, Object> data = new HashMap<>();
+        data.put("id", loginUser.getId());
+        data.put("expireTime", expireTime);
+        data.put("token", token);
+
+        return Result.ok(data);
+    }
+
+
+    /**
+     * 登录验证
+     *
      * @param loginVO
      * @return
      */
-    @ApiOperation("登录验证")
+    @ApiOperation("登录验证-有验证码")
     @ApiImplicitParam(name = "loginVO")
     @PostMapping("/login")
     public Result login(@Validated LoginVO loginVO) {
         //开发时不要打开
         //判断验证码是否正确
-//        String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
-//        System.out.println(verifyKey);
-//        String captcha = redisService.getCacheObject(verifyKey);
-//        redisService.deleteObject(verifyKey);
-//        if (captcha == null){
-//
-//            throw new MyException(ResultCode.ERROR,"验证码已失效");  //提示验证码已失效
-//        }
-//        if (!loginVO.getCode().equalsIgnoreCase(captcha)){  //比较是否相等，但忽略大小写
-//            throw new MyException(ResultCode.ERROR,"验证码错误");   //提示验证码错误
-//        }
+        String verifyKey = "captcha_codes:" + StringUtils.nvl(loginVO.getUuid(), "");
+        System.out.println(verifyKey);
+        String captcha = redisService.getCacheObject(verifyKey);
+        redisService.deleteObject(verifyKey);
+        if (captcha == null){
+
+            throw new MyException(ResultCode.ERROR,"验证码已失效");  //提示验证码已失效
+        }
+        if (!loginVO.getCode().equalsIgnoreCase(captcha)){  //比较是否相等，但忽略大小写
+            throw new MyException(ResultCode.ERROR,"验证码错误");   //提示验证码错误
+        }
 
 
         // 用户验证
