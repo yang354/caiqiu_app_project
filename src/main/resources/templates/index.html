@@ -68,7 +68,7 @@
         <div class="admin-card" align="center" shadow="never">
             <el-tabs v-model="activeName" @tab-click="handleClick" type="border-card" class="box-card">
                 <el-tab-pane label="增加" name="first">
-                    <el-form :label-position="labelPosition" ref="form" :rules="rules" label-width="90px"
+                    <el-form :label-position="labelPosition" ref="form1" :rules="rules" label-width="90px"
                              :model="form">
                         <el-form-item label="开奖号码" prop="region">
                             <el-input type="text" placeholder="请输入开奖号码" v-model="form.region" maxlength="5"
@@ -86,10 +86,10 @@
                     </el-form>
                 </el-tab-pane>
                 <el-tab-pane label="修改" name="second">
-                    <el-form :label-position="labelPosition" ref="form" :rules="rules" label-width="90px"
+                    <el-form :label-position="labelPosition" ref="form2" :rules="rules" label-width="90px"
                              :model="form">
-                        <el-form-item label="开奖号码" prop="region">
-                            <el-input type="text" placeholder="请输入开奖号码" v-model="form.region" maxlength="5"
+                        <el-form-item label="开奖金额" prop="region">
+                            <el-input type="text" placeholder="请输入开奖金额" v-model="form.region" maxlength="5"
                                       clearable>
                             </el-input>
                         </el-form-item>
@@ -103,10 +103,10 @@
                     </el-form>
                 </el-tab-pane>
                 <el-tab-pane label="删除" name="third">
-                    <el-form :label-position="labelPosition" ref="form" :rules="rules" label-width="90px"
+                    <el-form :label-position="labelPosition" ref="form3" :rules="rules" label-width="90px"
                              :model="form">
-                        <el-form-item label="开奖号码" prop="region">
-                            <el-input type="text" placeholder="请输入开奖号码" v-model="form.region" maxlength="5"
+                        <el-form-item label="开奖期号" prop="type">
+                            <el-input type="text" placeholder="请输入开奖期号" v-model="form.type" maxlength="5"
                                       clearable>
                             </el-input>
                         </el-form-item>
@@ -174,112 +174,134 @@
         },
         methods: {
             delCaiqiu(){
-                if(this.form.type==""|| this.form.type == undefined){
-                    return;
-                }
-                axios({
-                    url: "/api/lottery/delLottery",
-                    method: "post",
-                    params: {
-                        issueNumber: this.form.type
-                    }
-                }).then((res) => {
-                    //console.log(res)
-                    if (res.data.code !== 0){
-                        this.$notify.error({
-                            title: '错误',
-                            message: res.data.msg
-                        });
-                    } else {
-                        this.$notify({
-                            title: '成功',
-                            message: '删除成功',
-                            type: 'success'
-                        });
-                    }
+                this.$refs['form3'].validate((valid) => {
+                    if (valid) {
+                        axios({
+                            url: "/api/lottery/delLottery",
+                            method: "post",
+                            headers:{
+                                token : window.localStorage.getItem("token")
+                            },
+                            params: {
+                                issueNumber: this.form.type
+                            }
+                        }).then((res) => {
+                            //console.log(res)
+                            if (res.data.code !== 0){
+                                this.$notify.error({
+                                    title: '错误',
+                                    message: res.data.msg
+                                });
+                                window.location.href="/login2"
+                            } else {
+                                this.$notify({
+                                    title: '成功',
+                                    message: '删除成功',
+                                    type: 'success'
+                                });
+                                this.reset();
+                            }
 
-                }).catch((error) => {
-                    console.log(error)
-                })
+                        }).catch((error) => {
+                            console.log(error)
+                            window.location.href="/login2"
+                        })
+                    } else {
+                        return false;
+                    }
+                });
             },
             editCaiqiu(){
-                if(this.form.type==""|| this.form.type == undefined){
-                    return;
-                }
-                if(this.form.region==""|| this.form.region == undefined){
-                    return;
-                }
-                axios({
-                    url: "/api/lottery/editLottery",
-                    method: "post",
-                    params: {
-                        issueNumber: this.form.type,
-                        drawNumber: this.form.region
-                    }
-                }).then((res) => {
-                    //console.log(res)
-                    if (res.data.code !== 0){
-                        this.$notify.error({
-                            title: '错误',
-                            message: res.data.msg
-                        });
-                    } else {
-                        this.$notify({
-                            title: '成功',
-                            message: '修改成功',
-                            type: 'success'
-                        });
-                    }
+                this.$refs['form2'].validate((valid) => {
+                    if (valid) {
+                        axios({
+                            url: "/api/lottery/editLottery",
+                            method: "post",
+                            headers:{
+                                token : window.localStorage.getItem("token")
+                            },
+                            params: {
+                                issueNumber: this.form.type,
+                                drawNumber: this.form.region
+                            }
+                        }).then((res) => {
+                            //console.log(res)
+                            if (res.data.code !== 0){
+                                this.$notify.error({
+                                    title: '错误',
+                                    message: res.data.msg
+                                });
+                                window.location.href="/login2"
+                            } else {
+                                this.$notify({
+                                    title: '成功',
+                                    message: '修改成功',
+                                    type: 'success'
+                                });
+                                this.reset();
+                            }
 
-                }).catch((error) => {
-                    console.log(error)
-                })
+                        }).catch((error) => {
+                            console.log(error)
+                            window.location.href="/login2"
+                        })
+                    } else {
+                        return false;
+                    }
+                });
+
             },
             addCaiqiu() {
-                if(this.form.type==""|| this.form.type == undefined){
-                    return;
-                }
-                if(this.form.region==""|| this.form.region == undefined){
-                    return;
-                }
-
-                axios({
-                    url: "/api/lottery/addLottery",
-                    method: "post",
-                    params: {
-                        issueNumber: this.form.type,
-                        drawNumber: this.form.region
-                    }
-                }).then((res) => {
-                    //console.log(res)
-                    if (res.data.code !== 0){
-                        this.$notify.error({
-                            title: '错误',
-                            message: res.data.msg
-                        });
+                window.localStorage.removeItem("token");
+                this.$refs['form1'].validate((valid) => {
+                    if (valid) {
+                        axios({
+                            url: "/api/lottery/addLottery",
+                            method: "post",
+                            headers:{
+                                token : window.localStorage.getItem("token")
+                            },
+                            params: {
+                                issueNumber: this.form.type,
+                                drawNumber: this.form.region
+                            }
+                        }).then((res) => {
+                            //console.log(res)
+                            if (res.data.code !== 0){
+                                this.$notify.error({
+                                    title: '错误',
+                                    message: res.data.msg
+                                });
+                                window.location.href="/login2"
+                            } else {
+                                this.$notify({
+                                    title: '成功',
+                                    message: '添加成功',
+                                    type: 'success'
+                                });
+                                this.reset();
+                            }
+                        }).catch((error) => {
+                            console.log(error)
+                            window.location.href="/login2"
+                        })
                     } else {
-                        this.$notify({
-                            title: '成功',
-                            message: '添加成功',
-                            type: 'success'
-                        });
+                        return false;
                     }
-                }).catch((error) => {
-                    console.log(error)
-                })
+                });
             },
             reset() {
+
                 this.form = {
                     region: null,
                     type: null,
-
                 };
                 //this.resetForm("form");
             },
             handleClick(tab, event) {
                 this.reset();
                 // console.log(tab, event);
-            }
+            },
         }
     })
 </script>

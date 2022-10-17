@@ -72,10 +72,11 @@ secure:
       - /static/qrcode/**
       - /captchaImage
       - /caiqiuAdmin
-      - /api/lottery/addLottery
-      - /api/lottery/delLottery
-      - /api/lottery/editLottery
+#      - /api/lottery/addLottery
+#      - /api/lottery/delLottery
+#      - /api/lottery/editLottery
       - /login2
+      - /api/user/login2
 
 
 

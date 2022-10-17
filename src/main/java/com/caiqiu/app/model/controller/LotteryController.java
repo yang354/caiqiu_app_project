@@ -87,13 +87,15 @@ public class LotteryController {
         //5.算出大小比
         lottery.setSizeRatio(findMaxFour(chars) + ":" + findMinFour(chars));
         //6.算出和值
-        lottery.setAndValue(findAddNum(chars));
+        Integer addNum = findAddNum(chars);
+        lottery.setAndValue(addNum);
 
         //8.设置开奖号码
         lottery.setDrawNumber(lotteryEditVO.getDrawNumber());
 
         //8.1算出和尾走势
         // TODO: 2022/10/13
+        lottery.setMovements(String.valueOf(addNum%10));
 
         //9.按期号条件更新
 
@@ -148,10 +150,12 @@ public class LotteryController {
         lottery.setSizeRatio(findMaxFour(chars) + ":" + findMinFour(chars));
 
         //6.算出和值
-        lottery.setAndValue(findAddNum(chars));
+        Integer addNum = findAddNum(chars);
+        lottery.setAndValue(addNum);
 
         //6.1算出和尾走势
         // TODO: 2022/10/13
+        lottery.setMovements(String.valueOf(addNum%10));
 
         //7.设置期号
         lottery.setIssueNumber(lotteryAddVO.getIssueNumber());
