@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.HashMap;
 
 /**
  * <p>
@@ -75,7 +76,19 @@ public class LotteryController {
         char[] chars = lotteryEditVO.getDrawNumber().toCharArray();
         //2.算出开奖号分布
         char[] bubbSort = bubbSort(chars);
-        lottery.setNumberDistribution(String.valueOf(bubbSort));
+        HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>();
+        for (int i=0;i<10;i++){
+            int count = 0;
+            for (int j = 0; j <bubbSort.length ; j++) {
+                if(Integer.parseInt(String.valueOf(bubbSort[j]))==i){
+                    count++;
+                }
+            }
+            hashMap.put(i,count);
+        }
+        String s = hashMap.toString().replaceAll(" ","");
+        lottery.setNumberDistribution(s);
+
 
         //3.算出跨度
         char maxNum = findMaxNum(chars);
@@ -135,7 +148,21 @@ public class LotteryController {
         char[] chars = lotteryAddVO.getDrawNumber().toCharArray();
         //2.算出开奖号分布
         char[] bubbSort = bubbSort(chars);
-        lottery.setNumberDistribution(String.valueOf(bubbSort));
+        HashMap<Integer, Integer> hashMap = new HashMap<Integer, Integer>();
+        for (int i=0;i<10;i++){
+            int count = 0;
+            for (int j = 0; j <bubbSort.length ; j++) {
+                if(Integer.parseInt(String.valueOf(bubbSort[j]))==i){
+                    count++;
+                }
+            }
+            hashMap.put(i,count);
+        }
+
+
+        String s = hashMap.toString().replaceAll(" ","");
+        lottery.setNumberDistribution(s);
+
 
 
         //3.算出跨度
@@ -180,6 +207,7 @@ public class LotteryController {
         IPage<Lottery> page = new Page<Lottery>(1L, lotteryQueryVO.getPageSize());
         //调用分页查询方法
         lotteryService.findLotterys(page, lotteryQueryVO);
+
         return Result.ok(page);
     }
 
