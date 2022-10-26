@@ -204,7 +204,7 @@ public class LotteryController {
     @PostMapping("/getLottery")
     public Result getLottery(@RequestBody LotteryQueryVO lotteryQueryVO) {
         //创建分页对象
-        IPage<Lottery> page = new Page<Lottery>(1L, lotteryQueryVO.getPageSize());
+        IPage<Lottery> page = new Page<Lottery>(lotteryQueryVO.getPageNo(),lotteryQueryVO.getPageSize());
         //调用分页查询方法
         lotteryService.findLotterys(page, lotteryQueryVO);
 
